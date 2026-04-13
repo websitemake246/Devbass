@@ -245,6 +245,14 @@ app.delete('/api/files/:fileId', authenticate, (req, res) => {
     );
 });
 
+// Get user's API key
+app.get('/api/user/api-key', authenticate, (req, res) => {
+    db.get('SELECT api_key FROM users WHERE id = ?', [req.userId], (err, user) => {
+        if (err || !user) return res.status(404).json({ error: 'User not found' });
+        res.json({ apiKey: user.api_key });
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`🚀 BaaS Server running on http://localhost:${PORT}`);
     console.log(`📁 API Base URL: http://localhost:${PORT}/api`);
