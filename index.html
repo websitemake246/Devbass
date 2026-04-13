@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer BaaS Platform - Store JSON, Files & More</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --dark: #0f172a;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: rgba(15, 23, 42, 0.95) !important;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .api-key-display {
+            font-family: 'Monaco', monospace;
+            background: var(--dark);
+            color: #10b981;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        
+        .code-block {
+            background: var(--dark);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .json-editor {
+            font-family: 'Monaco', monospace;
+            background: var(--dark);
+            color: #e2e8f0;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .file-list-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        
+        .record-item {
+            background: white;
+            border-left: 4px solid var(--primary);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <span class="navbar-brand h1 mb-0">⚡ DevBaaS</span>
+            <div id="userInfo" style="display: none;">
+                <span class="text-white me-3" id="userEmail"></span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Auth Section -->
+        <div id="authSection" class="fade-in">
+            <div class="auth-container">
+                <div class="card p-4">
+                    <h3 class="text-center mb-4">🚀 Welcome to DevBaaS</h3>
+                    <ul class="nav nav-tabs mb-3" id="authTab" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#login">Login</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#register">Register</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="login">
+                            <input type="email" id="loginEmail" class="form-control mb-2" placeholder="Email">
+                            <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Password">
+                            <button class="btn btn-gradient w-100" onclick="login()">Login</button>
+                        </div>
+                        <div class="tab-pane fade" id="register">
+                            <input type="email" id="regEmail" class="form-control mb-2" placeholder="Email">
+                            <input type="password" id="regPassword" class="form-control mb-2" placeholder="Password">
+                            <button class="btn btn-gradient w-100" onclick="register()">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" style="display: none;">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 mb-3">
+                    <div class="card p-3">
+                        <h5>🔑 Your API Key</h5>
+                        <div class="api-key-display" id="apiKeyDisplay"></div>
+                        <button class="btn btn-sm btn-outline-primary mt-2" onclick="copyApiKey()">📋 Copy API Key</button>
+                        <hr>
+                        <h5>📂 Collections</h5>
+                        <div id="collectionsList"></div>
+                        <input type="text" id="newCollectionName" class="form-control form-control-sm mt-2" placeholder="New collection name">
+                        <button class="btn btn-primary btn-sm mt-2" onclick="createCollection()">+ Create Collection</button>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-md-9">
+                    <!-- API Docs Card -->
+                    <div class="card p-3 mb-3">
+                        <h5>📖 API Documentation</h5>
+                        <div class="alert alert-info">
+                            <strong>Base URL:</strong> http://localhost:3000/api
+                        </div>
+                        <div class="code-block">
+                            <pre><code class="language-javascript">// Example: Store JSON data
+fetch('http://localhost:3000/api/collections/1/records', {
+    method: 'POST',
+    headers: {
+        'Authorization': 'Bearer YOUR_TOKEN',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        title: "My Post",
+        content: "Hello World",
+        views: 0
+    })
+});
+
+// Example: Upload file
+const formData = new FormData();
+formData.append('file', fileInput.files[0]);
+fetch('http://localhost:3000/api/files/upload', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer YOUR_TOKEN' },
+    body: formData
+});</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Records Section -->
+                    <div class="card p-3 mb-3" id="recordsCard" style="display: none;">
+                        <h5>📝 Records in <span id="currentCollectionName"></span></h5>
+                        <div id="recordsList"></div>
+                        <hr>
+                        <h6>Add New Record</h6>
+                        <textarea id="newRecordData" rows="3" class="json-editor" placeholder='{"key": "value"}'></textarea>
+                        <button class="btn btn-success btn-sm mt-2" onclick="createRecord()">+ Add Record</button>
+                    </div>
+
+                    <!-- Files Section -->
+                    <div class="card p-3">
+                        <h5>📎 File Manager</h5>
+                        <input type="file" id="fileInput" class="form-control mb-2">
+                        <button class="btn btn-gradient w-100 mb-3" onclick="uploadFile()">Upload File</button>
+                        <div id="filesList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script>
+        let currentToken = null;
+        let currentUserId = null;
+        let currentCollections = [];
+        let currentCollectionId = null;
+
+        // Auth functions
+        async function register() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            const res = await fetch('http://localhost:3000/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                currentToken = data.token;
+                currentUserId = data.userId;
+                localStorage.setItem('token', currentToken);
+                localStorage.setItem('userId', currentUserId);
+                document.getElementById('apiKeyDisplay').innerText = data.apiKey;
+                showDashboard(email);
+            } else {
+                alert('Registration failed');
+            }
+        }
+        
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const res = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                currentToken = data.token;
+                currentUserId = data.userId;
+                localStorage.setItem('token', currentToken);
+                localStorage.setItem('userId', currentUserId);
+                
+                // Get API key
+                const userRes = await fetch('http://localhost:3000/api/user/api-key', {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                const userData = await userRes.json();
+                document.getElementById('apiKeyDisplay').innerText = userData.apiKey || 'N/A';
+                
+                showDashboard(email);
+            } else {
+                alert('Login failed');
+            }
+        }
+        
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+        
+        async function showDashboard(email) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            document.getElementById('userEmail').innerText = email;
+            document.getElementById('userInfo').style.display = 'block';
+            
+            await loadCollections();
+            await loadFiles();
+        }
+        
+        // Collections
+        async function loadCollections() {
+            const res = await fetch('http://localhost:3000/api/collections', {
+                headers: { 'Authorization': `Bearer ${currentToken}` }
+            });
+            currentCollections = await res.json();
+            
+            const container = document.getElementById('collectionsList');
+            container.innerHTML = currentCollections.map(col => `
+                <div class="file-list-item" onclick="selectCollection(${col.id}, '${col.name}')">
+                    📁 ${col.name}
+                </div>
+            `).join('');
+        }
+        
+        async function createCollection() {
+            const name = document.getElementById('newCollectionName').value;
+            if (!name) return;
+            
+            await fetch('http://localhost:3000/api/collections', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name })
+            });
+            
+            document.getElementById('newCollectionName').value = '';
+            await loadCollections();
+        }
+        
+        async function selectCollection(id, name) {
+            currentCollectionId = id;
+            document.getElementById('currentCollectionName').innerText = name;
+            document.getElementById('recordsCard').style.display = 'block';
+            
+            const res = await fetch(`http://localhost:3000/api/collections/${id}/records`, {
+                headers: { 'Authorization': `Bearer ${currentToken}` }
+            });
+            const records = await res.json();
+            
+            const container = document.getElementById('recordsList');
+            container.innerHTML = records.map(record => `
+                <div class="record-item">
+                    <strong>ID: ${record.id}</strong>
+                    <pre class="mb-2 mt-2"><code>${JSON.stringify(record.data, null, 2)}</code></pre>
+                    <small>Created: ${new Date(record.created_at).toLocaleString()}</small>
+                    <button class="btn btn-danger btn-sm float-end" onclick="deleteRecord(${record.id})">Delete</button>
+                    <button class="btn btn-warning btn-sm float-end me-2" onclick="editRecord(${record.id})">Edit</button>
+                </div>
+            `).join('');
+        }
+        
+        async function createRecord() {
+            const dataText = document.getElementById('newRecordData').value;
+            try {
+                const data = JSON.parse(dataText);
+                await fetch(`http://localhost:3000/api/collections/${currentCollectionId}/records`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                document.getElementById('newRecordData').value = '';
+                selectCollection(currentCollectionId, document.getElementById('currentCollectionName').innerText);
+            } catch (e) {
+                alert('Invalid JSON');
+            }
+        }
+        
+        async function deleteRecord(recordId) {
+            if (confirm('Delete this record?')) {
+                await fetch(`http://localhost:3000/api/records/${recordId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                selectCollection(currentCollectionId, document.getElementById('currentCollectionName').innerText);
+            }
+        }
+        
+        function editRecord(recordId) {
+            const newData = prompt('Enter new JSON data:');
+            if (newData) {
+                try {
+                    const data = JSON.parse(newData);
+                    fetch(`http://localhost:3000/api/records/${recordId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${currentToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    }).then(() => {
+                        selectCollection(currentCollectionId, document.getElementById('currentCollectionName').innerText);
+                    });
+                } catch (e) {
+                    alert('Invalid JSON');
+                }
+            }
+        }
+        
+        // File management
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            await fetch('http://localhost:3000/api/files/upload', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${currentToken}` },
+                body: formData
+            });
+            
+            fileInput.value = '';
+            await loadFiles();
+        }
+        
+        async function loadFiles() {
+            const res = await fetch('http://localhost:3000/api/files', {
+                headers: { 'Authorization': `Bearer ${currentToken}` }
+            });
+            const files = await res.json();
+            
+            const container = document.getElementById('filesList');
+            container.innerHTML = files.map(file => `
+                <div class="file-list-item">
+                    📄 ${file.original_name} (${(file.size / 1024).toFixed(2)} KB)
+                    <button class="btn btn-danger btn-sm float-end" onclick="deleteFile(${file.id})">Delete</button>
+                    <button class="btn btn-info btn-sm float-end me-2" onclick="downloadFile('${file.original_name}', ${file.id})">Download</button>
+                </div>
+            `).join('');
+        }
+        
+        async function deleteFile(fileId) {
+            if (confirm('Delete this file?')) {
+                await fetch(`http://localhost:3000/api/files/${fileId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                await loadFiles();
+            }
+        }
+        
+        function downloadFile(filename, fileId) {
+            window.open(`http://localhost:3000/api/files/${fileId}?token=${currentToken}`, '_blank');
+        }
+        
+        function copyApiKey() {
+            const text = document.getElementById('apiKeyDisplay').innerText;
+            navigator.clipboard.writeText(text);
+            alert('API Key copied!');
+        }
+        
+        // Check for existing session
+        const savedToken = localStorage.getItem('token');
+        if (savedToken) {
+            currentToken = savedToken;
+            currentUserId = localStorage.getItem('userId');
+            fetch('http://localhost:3000/api/collections', {
+                headers: { 'Authorization': `Bearer ${currentToken}` }
+            }).then(res => {
+                if (res.ok) {
+                    showDashboard('Developer');
+                }
+            }).catch(() => {
+                localStorage.clear();
+            });
+        }
+    </script>
+</body>
+</html>
