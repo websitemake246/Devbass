@@ -3,113 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Developer BaaS Platform - Store JSON, Files & More</title>
+    <title>DevBaaS - Backend as a Service for Developers</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <style>
-        :root {
-            --primary: #6366f1;
-            --secondary: #8b5cf6;
-            --dark: #0f172a;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
         
         .navbar {
-            background: rgba(15, 23, 42, 0.95) !important;
+            background: rgba(0, 0, 0, 0.3) !important;
             backdrop-filter: blur(10px);
         }
         
         .card {
             border: none;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
         
-        .card:hover {
-            transform: translateY(-5px);
+        .auth-container {
+            max-width: 450px;
+            margin: 80px auto;
         }
         
-        .api-key-display {
-            font-family: 'Monaco', monospace;
-            background: var(--dark);
+        .api-key-box {
+            background: #1e1e2e;
             color: #10b981;
-            padding: 15px;
-            border-radius: 10px;
+            font-family: monospace;
+            padding: 12px;
+            border-radius: 8px;
             font-size: 12px;
             word-break: break-all;
         }
         
-        .code-block {
-            background: var(--dark);
-            border-radius: 10px;
+        .collection-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .collection-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .record-card {
+            background: white;
+            border-left: 4px solid #667eea;
             padding: 15px;
             margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .file-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .btn-gradient {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 10px 30px;
-            border-radius: 10px;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
             font-weight: 600;
         }
         
         .btn-gradient:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
-        .json-editor {
-            font-family: 'Monaco', monospace;
-            background: var(--dark);
-            color: #e2e8f0;
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
             border: none;
             border-radius: 10px;
-            padding: 15px;
-        }
-        
-        .file-list-item {
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 5px 0;
-            cursor: pointer;
-        }
-        
-        .record-item {
-            background: white;
-            border-left: 4px solid var(--primary);
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 10px;
-        }
-        
-        .auth-container {
-            max-width: 400px;
-            margin: 100px auto;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-dark">
         <div class="container">
-            <span class="navbar-brand h1 mb-0">⚡ DevBaaS</span>
+            <span class="navbar-brand h1 mb-0">🚀 DevBaaS</span>
             <div id="userInfo" style="display: none;">
                 <span class="text-white me-3" id="userEmail"></span>
                 <button class="btn btn-outline-light btn-sm" onclick="logout()">Logout</button>
@@ -117,12 +116,14 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container">
         <!-- Auth Section -->
-        <div id="authSection" class="fade-in">
+        <div id="authSection">
             <div class="auth-container">
                 <div class="card p-4">
-                    <h3 class="text-center mb-4">🚀 Welcome to DevBaaS</h3>
+                    <h3 class="text-center mb-4">✨ Welcome to DevBaaS</h3>
+                    <p class="text-center text-muted mb-4">Store JSON data, files, and more with a simple API</p>
+                    
                     <ul class="nav nav-tabs mb-3" id="authTab" role="tablist">
                         <li class="nav-item">
                             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#login">Login</button>
@@ -131,81 +132,84 @@
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#register">Register</button>
                         </li>
                     </ul>
+                    
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="login">
-                            <input type="email" id="loginEmail" class="form-control mb-2" placeholder="Email">
-                            <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Password">
+                            <div id="loginError" class="alert alert-danger" style="display: none;"></div>
+                            <input type="email" id="loginEmail" class="form-control mb-2" placeholder="Email address">
+                            <input type="password" id="loginPassword" class="form-control mb-2" placeholder="Password (min 6 characters)">
                             <button class="btn btn-gradient w-100" onclick="login()">Login</button>
                         </div>
+                        
                         <div class="tab-pane fade" id="register">
-                            <input type="email" id="regEmail" class="form-control mb-2" placeholder="Email">
-                            <input type="password" id="regPassword" class="form-control mb-2" placeholder="Password">
-                            <button class="btn btn-gradient w-100" onclick="register()">Register</button>
+                            <div id="registerError" class="alert alert-danger" style="display: none;"></div>
+                            <input type="email" id="regEmail" class="form-control mb-2" placeholder="Email address">
+                            <input type="password" id="regPassword" class="form-control mb-2" placeholder="Password (min 6 characters)">
+                            <button class="btn btn-gradient w-100" onclick="register()">Create Account</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Section -->
+        <!-- Dashboard -->
         <div id="dashboardSection" style="display: none;">
-            <div class="row">
-                <!-- Sidebar -->
-                <div class="col-md-3 mb-3">
+            <div class="row mt-4">
+                <!-- Left Sidebar -->
+                <div class="col-md-3 mb-4">
                     <div class="card p-3">
                         <h5>🔑 Your API Key</h5>
-                        <div class="api-key-display" id="apiKeyDisplay"></div>
+                        <div class="api-key-box" id="apiKeyDisplay">Loading...</div>
                         <button class="btn btn-sm btn-outline-primary mt-2" onclick="copyApiKey()">📋 Copy API Key</button>
+                        
                         <hr>
-                        <h5>📂 Collections</h5>
+                        
+                        <h5>📁 Collections</h5>
                         <div id="collectionsList"></div>
-                        <input type="text" id="newCollectionName" class="form-control form-control-sm mt-2" placeholder="New collection name">
-                        <button class="btn btn-primary btn-sm mt-2" onclick="createCollection()">+ Create Collection</button>
+                        <div class="mt-2">
+                            <input type="text" id="newCollectionName" class="form-control form-control-sm" placeholder="Collection name">
+                            <button class="btn btn-primary btn-sm mt-2 w-100" onclick="createCollection()">+ Create Collection</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Main Content -->
+                <!-- Right Content -->
                 <div class="col-md-9">
-                    <!-- API Docs Card -->
-                    <div class="card p-3 mb-3">
-                        <h5>📖 API Documentation</h5>
+                    <!-- API Docs -->
+                    <div class="card p-3 mb-4">
+                        <h5>📚 Quick API Reference</h5>
                         <div class="alert alert-info">
-                            <strong>Base URL:</strong> http://localhost:3000/api
+                            <strong>Base URL:</strong> <code>http://localhost:3000/api</code><br>
+                            <strong>Authentication:</strong> Add header <code>Authorization: Bearer YOUR_TOKEN</code>
                         </div>
-                        <div class="code-block">
-                            <pre><code class="language-javascript">// Example: Store JSON data
+                        <pre><code>// Store JSON data
 fetch('http://localhost:3000/api/collections/1/records', {
     method: 'POST',
     headers: {
-        'Authorization': 'Bearer YOUR_TOKEN',
+        'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-        title: "My Post",
-        content: "Hello World",
-        views: 0
-    })
+    body: JSON.stringify({ title: "My Post", content: "Hello" })
 });
 
-// Example: Upload file
+// Upload file
 const formData = new FormData();
-formData.append('file', fileInput.files[0]);
+formData.append('file', file);
 fetch('http://localhost:3000/api/files/upload', {
     method: 'POST',
-    headers: { 'Authorization': 'Bearer YOUR_TOKEN' },
+    headers: { 'Authorization': 'Bearer ' + token },
     body: formData
 });</code></pre>
-                        </div>
                     </div>
 
                     <!-- Records Section -->
-                    <div class="card p-3 mb-3" id="recordsCard" style="display: none;">
+                    <div class="card p-3 mb-4" id="recordsCard" style="display: none;">
                         <h5>📝 Records in <span id="currentCollectionName"></span></h5>
                         <div id="recordsList"></div>
                         <hr>
-                        <h6>Add New Record</h6>
-                        <textarea id="newRecordData" rows="3" class="json-editor" placeholder='{"key": "value"}'></textarea>
-                        <button class="btn btn-success btn-sm mt-2" onclick="createRecord()">+ Add Record</button>
+                        <h6>➕ Add New Record</h6>
+                        <textarea id="newRecordData" rows="3" class="form-control" placeholder='{"title": "Example", "value": 123}'></textarea>
+                        <button class="btn btn-success btn-sm mt-2" onclick="createRecord()">Save Record</button>
                     </div>
 
                     <!-- Files Section -->
@@ -221,138 +225,241 @@ fetch('http://localhost:3000/api/files/upload', {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
     <script>
         let currentToken = null;
         let currentUserId = null;
         let currentCollections = [];
         let currentCollectionId = null;
-
-        // Auth functions
+        
+        // Check for existing session
+        const savedToken = localStorage.getItem('token');
+        if (savedToken) {
+            currentToken = savedToken;
+            currentUserId = localStorage.getItem('userId');
+            // Verify token is still valid
+            fetch('http://localhost:3000/api/collections', {
+                headers: { 'Authorization': `Bearer ${currentToken}` }
+            }).then(res => {
+                if (res.ok) {
+                    loadDashboard();
+                } else {
+                    // Token invalid, clear storage
+                    localStorage.clear();
+                }
+            }).catch(() => {
+                localStorage.clear();
+            });
+        }
+        
         async function register() {
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
+            const errorDiv = document.getElementById('registerError');
             
-            const res = await fetch('http://localhost:3000/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
+            errorDiv.style.display = 'none';
             
-            if (res.ok) {
-                const data = await res.json();
-                currentToken = data.token;
-                currentUserId = data.userId;
-                localStorage.setItem('token', currentToken);
-                localStorage.setItem('userId', currentUserId);
-                document.getElementById('apiKeyDisplay').innerText = data.apiKey;
-                showDashboard(email);
-            } else {
-                alert('Registration failed');
+            if (!email || !password) {
+                errorDiv.textContent = 'Please fill in all fields';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorDiv.textContent = 'Password must be at least 6 characters';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Save token and user info
+                    currentToken = data.token;
+                    currentUserId = data.userId;
+                    localStorage.setItem('token', currentToken);
+                    localStorage.setItem('userId', currentUserId);
+                    
+                    // Load dashboard
+                    await loadDashboard();
+                } else {
+                    errorDiv.textContent = data.error || 'Registration failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Is the server running?';
+                errorDiv.style.display = 'block';
+                console.error('Registration error:', error);
             }
         }
         
         async function login() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
             
-            const res = await fetch('http://localhost:3000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
+            errorDiv.style.display = 'none';
             
-            if (res.ok) {
-                const data = await res.json();
-                currentToken = data.token;
-                currentUserId = data.userId;
-                localStorage.setItem('token', currentToken);
-                localStorage.setItem('userId', currentUserId);
-                
-                // Get API key
-                const userRes = await fetch('http://localhost:3000/api/user/api-key', {
-                    headers: { 'Authorization': `Bearer ${currentToken}` }
+            if (!email || !password) {
+                errorDiv.textContent = 'Please fill in all fields';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
                 });
-                const userData = await userRes.json();
-                document.getElementById('apiKeyDisplay').innerText = userData.apiKey || 'N/A';
                 
-                showDashboard(email);
-            } else {
-                alert('Login failed');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentToken = data.token;
+                    currentUserId = data.userId;
+                    localStorage.setItem('token', currentToken);
+                    localStorage.setItem('userId', currentUserId);
+                    
+                    await loadDashboard();
+                } else {
+                    errorDiv.textContent = data.error || 'Invalid email or password';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Make sure the server is running on port 3000';
+                errorDiv.style.display = 'block';
+                console.error('Login error:', error);
             }
         }
         
         function logout() {
             localStorage.clear();
-            location.reload();
+            currentToken = null;
+            currentUserId = null;
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
         }
         
-        async function showDashboard(email) {
+        async function loadDashboard() {
+            // Hide auth, show dashboard
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
-            document.getElementById('userEmail').innerText = email;
-            document.getElementById('userInfo').style.display = 'block';
             
+            // Get user info
+            try {
+                const userRes = await fetch('http://localhost:3000/api/user/info', {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                const userData = await userRes.json();
+                document.getElementById('userEmail').innerText = userData.email;
+                document.getElementById('apiKeyDisplay').innerText = userData.apiKey;
+                document.getElementById('userInfo').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to load user info:', error);
+            }
+            
+            // Load collections and files
             await loadCollections();
             await loadFiles();
         }
         
-        // Collections
         async function loadCollections() {
-            const res = await fetch('http://localhost:3000/api/collections', {
-                headers: { 'Authorization': `Bearer ${currentToken}` }
-            });
-            currentCollections = await res.json();
-            
-            const container = document.getElementById('collectionsList');
-            container.innerHTML = currentCollections.map(col => `
-                <div class="file-list-item" onclick="selectCollection(${col.id}, '${col.name}')">
-                    📁 ${col.name}
-                </div>
-            `).join('');
+            try {
+                const response = await fetch('http://localhost:3000/api/collections', {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                currentCollections = await response.json();
+                
+                const container = document.getElementById('collectionsList');
+                if (currentCollections.length === 0) {
+                    container.innerHTML = '<p class="text-muted small">No collections yet. Create one!</p>';
+                } else {
+                    container.innerHTML = currentCollections.map(col => `
+                        <div class="collection-item" onclick="selectCollection(${col.id}, '${col.name}')">
+                            📁 ${col.name}
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load collections:', error);
+            }
         }
         
         async function createCollection() {
             const name = document.getElementById('newCollectionName').value;
-            if (!name) return;
+            if (!name) {
+                alert('Please enter a collection name');
+                return;
+            }
             
-            await fetch('http://localhost:3000/api/collections', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${currentToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name })
-            });
-            
-            document.getElementById('newCollectionName').value = '';
-            await loadCollections();
+            try {
+                await fetch('http://localhost:3000/api/collections', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+                
+                document.getElementById('newCollectionName').value = '';
+                await loadCollections();
+            } catch (error) {
+                alert('Failed to create collection');
+                console.error(error);
+            }
         }
         
         async function selectCollection(id, name) {
             currentCollectionId = id;
-            document.getElementById('currentCollectionName').innerText = name;
+            document.getElementById('currentCollectionName').innerHTML = `<strong>${name}</strong>`;
             document.getElementById('recordsCard').style.display = 'block';
             
-            const res = await fetch(`http://localhost:3000/api/collections/${id}/records`, {
-                headers: { 'Authorization': `Bearer ${currentToken}` }
-            });
-            const records = await res.json();
-            
-            const container = document.getElementById('recordsList');
-            container.innerHTML = records.map(record => `
-                <div class="record-item">
-                    <strong>ID: ${record.id}</strong>
-                    <pre class="mb-2 mt-2"><code>${JSON.stringify(record.data, null, 2)}</code></pre>
-                    <small>Created: ${new Date(record.created_at).toLocaleString()}</small>
-                    <button class="btn btn-danger btn-sm float-end" onclick="deleteRecord(${record.id})">Delete</button>
-                    <button class="btn btn-warning btn-sm float-end me-2" onclick="editRecord(${record.id})">Edit</button>
-                </div>
-            `).join('');
+            try {
+                const response = await fetch(`http://localhost:3000/api/collections/${id}/records`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                const records = await response.json();
+                
+                const container = document.getElementById('recordsList');
+                if (records.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No records yet. Add your first record above!</p>';
+                } else {
+                    container.innerHTML = records.map(record => `
+                        <div class="record-card">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div style="flex: 1;">
+                                    <pre style="margin: 0;">${JSON.stringify(record.data, null, 2)}</pre>
+                                    <small class="text-muted">ID: ${record.id} | Created: ${new Date(record.created_at).toLocaleString()}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-warning btn-sm me-1" onclick="editRecord(${record.id})">✏️</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteRecord(${record.id})">🗑️</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load records:', error);
+            }
         }
         
         async function createRecord() {
             const dataText = document.getElementById('newRecordData').value;
+            if (!dataText) {
+                alert('Please enter JSON data');
+                return;
+            }
+            
             try {
                 const data = JSON.parse(dataText);
                 await fetch(`http://localhost:3000/api/collections/${currentCollectionId}/records`, {
@@ -363,77 +470,112 @@ fetch('http://localhost:3000/api/files/upload', {
                     },
                     body: JSON.stringify(data)
                 });
+                
                 document.getElementById('newRecordData').value = '';
-                selectCollection(currentCollectionId, document.getElementById('currentCollectionName').innerText);
-            } catch (e) {
-                alert('Invalid JSON');
+                await selectCollection(currentCollectionId, '');
+            } catch (error) {
+                if (error instanceof SyntaxError) {
+                    alert('Invalid JSON format. Example: {"key": "value"}');
+                } else {
+                    alert('Failed to create record');
+                    console.error(error);
+                }
             }
         }
         
-        async function deleteRecord(recordId) {
-            if (confirm('Delete this record?')) {
-                await fetch(`http://localhost:3000/api/records/${recordId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${currentToken}` }
-                });
-                selectCollection(currentCollectionId, document.getElementById('currentCollectionName').innerText);
-            }
-        }
-        
-        function editRecord(recordId) {
+        async function editRecord(recordId) {
             const newData = prompt('Enter new JSON data:');
             if (newData) {
                 try {
                     const data = JSON.parse(newData);
-                    fetch(`http://localhost:3000/api/records/${recordId}`, {
+                    await fetch(`http://localhost:3000/api/records/${recordId}`, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${currentToken}`,
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(data)
-                    }).then(() => {
-                        selectCollection(currentCollectionId, document.getElementById('currentCollectionName').innerText);
                     });
-                } catch (e) {
-                    alert('Invalid JSON');
+                    await selectCollection(currentCollectionId, '');
+                } catch (error) {
+                    alert('Invalid JSON format');
                 }
             }
         }
         
-        // File management
+        async function deleteRecord(recordId) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                await fetch(`http://localhost:3000/api/records/${recordId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                await selectCollection(currentCollectionId, '');
+            }
+        }
+        
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
-            if (!file) return;
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
             
             const formData = new FormData();
             formData.append('file', file);
             
-            await fetch('http://localhost:3000/api/files/upload', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${currentToken}` },
-                body: formData
-            });
-            
-            fileInput.value = '';
-            await loadFiles();
+            try {
+                const response = await fetch('http://localhost:3000/api/files/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${currentToken}` },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    fileInput.value = '';
+                    await loadFiles();
+                    alert('File uploaded successfully!');
+                } else {
+                    alert('Upload failed');
+                }
+            } catch (error) {
+                alert('Upload failed');
+                console.error(error);
+            }
         }
         
         async function loadFiles() {
-            const res = await fetch('http://localhost:3000/api/files', {
-                headers: { 'Authorization': `Bearer ${currentToken}` }
-            });
-            const files = await res.json();
-            
-            const container = document.getElementById('filesList');
-            container.innerHTML = files.map(file => `
-                <div class="file-list-item">
-                    📄 ${file.original_name} (${(file.size / 1024).toFixed(2)} KB)
-                    <button class="btn btn-danger btn-sm float-end" onclick="deleteFile(${file.id})">Delete</button>
-                    <button class="btn btn-info btn-sm float-end me-2" onclick="downloadFile('${file.original_name}', ${file.id})">Download</button>
-                </div>
-            `).join('');
+            try {
+                const response = await fetch('http://localhost:3000/api/files', {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                const files = await response.json();
+                
+                const container = document.getElementById('filesList');
+                if (files.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No files uploaded yet</p>';
+                } else {
+                    container.innerHTML = files.map(file => `
+                        <div class="file-item">
+                            <div>
+                                📄 <strong>${file.original_name}</strong><br>
+                                <small class="text-muted">${(file.size / 1024).toFixed(2)} KB • ${new Date(file.created_at).toLocaleDateString()}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-info btn-sm me-1" onclick="downloadFile('${file.filename}')">⬇️</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteFile(${file.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load files:', error);
+            }
+        }
+        
+        function downloadFile(filename) {
+            window.open(`http://localhost:3000/api/files/${filename}?token=${currentToken}`, '_blank');
         }
         
         async function deleteFile(fileId) {
@@ -446,30 +588,10 @@ fetch('http://localhost:3000/api/files/upload', {
             }
         }
         
-        function downloadFile(filename, fileId) {
-            window.open(`http://localhost:3000/api/files/${fileId}?token=${currentToken}`, '_blank');
-        }
-        
         function copyApiKey() {
             const text = document.getElementById('apiKeyDisplay').innerText;
             navigator.clipboard.writeText(text);
-            alert('API Key copied!');
-        }
-        
-        // Check for existing session
-        const savedToken = localStorage.getItem('token');
-        if (savedToken) {
-            currentToken = savedToken;
-            currentUserId = localStorage.getItem('userId');
-            fetch('http://localhost:3000/api/collections', {
-                headers: { 'Authorization': `Bearer ${currentToken}` }
-            }).then(res => {
-                if (res.ok) {
-                    showDashboard('Developer');
-                }
-            }).catch(() => {
-                localStorage.clear();
-            });
+            alert('API Key copied to clipboard!');
         }
     </script>
 </body>
